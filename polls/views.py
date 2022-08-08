@@ -1,20 +1,14 @@
 import json
-from json import JSONEncoder
-from logging import exception
-from urllib import response
-from django.forms import model_to_dict
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
-from django.views.generic import ListView,FormView, DetailView
+from django.views.generic import ListView, FormView, DetailView
 import requests
-from yaml import serialize_all
 from polls import serializers
 from polls.models import Operacoes, Empresa
 from .forms import CnpjForm
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-from django.utils import timezone
 import datetime
 from django.core import serializers
 # Create your views here.
@@ -52,7 +46,8 @@ def view_expiration_date(request, cnpj):
     operacoes_object = Operacoes.objects.filter(cnpj=cnpj).values()
 
     try:
-        naive = operacoes_object[0]['update_time'] + datetime.timedelta(days=30)
+        naive = operacoes_object[0]['update_time'] + \
+            datetime.timedelta(days=30)
         if operacoes_object[0]['update_time'] < naive:
             # update_time é menor que 30 dias
             return HttpResponseRedirect(reverse('polls:informacao', args=[cnpj]))
@@ -98,8 +93,9 @@ def busca_dados(request, cnpj):
     Get info on BNDES API and insert into DATABASE
     """
 
-    #request to BNDES API
-    url = "https://apis-gateway.bndes.gov.br/transparencia/v2/cliente/%s" % (cnpj)
+    # request to BNDES API
+    url = "https://apis-gateway.bndes.gov.br/transparencia/v2/cliente/%s" % (
+        cnpj)
 
     session = requests.Session()
     retry = Retry(connect=3, backoff_factor=0.5)
@@ -110,8 +106,8 @@ def busca_dados(request, cnpj):
     response = session.get(url)
     data = response.json()
 
-    #campos variaveis entre null e com informação
-    cnpjAgenteFinanceiro_list=[]
+    # campos variaveis entre null e com informação
+    cnpjAgenteFinanceiro_list = []
     municipio_list = []
     agenteFinanceiro_list = []
     ramoAtividade_list = []
@@ -119,8 +115,10 @@ def busca_dados(request, cnpj):
     taxaJuros_list = []
     prazoAmortizacao_list = []
     prazoCarencia_list = []
-    lists_name = [ramoAtividade_list, custoFinanceiro_list, taxaJuros_list, prazoAmortizacao_list, prazoCarencia_list,agenteFinanceiro_list, municipio_list, cnpjAgenteFinanceiro_list ]
-    values_list = ['ramoAtividade', 'custoFinanceiro', 'taxaJuros', 'prazoAmortizacao', 'prazoCarencia', 'agenteFinanceiro', 'municipio', 'cnpjAgenteFinanceiro']
+    lists_name = [ramoAtividade_list, custoFinanceiro_list, taxaJuros_list, prazoAmortizacao_list,
+                  prazoCarencia_list, agenteFinanceiro_list, municipio_list, cnpjAgenteFinanceiro_list]
+    values_list = ['ramoAtividade', 'custoFinanceiro', 'taxaJuros', 'prazoAmortizacao',
+                   'prazoCarencia', 'agenteFinanceiro', 'municipio', 'cnpjAgenteFinanceiro']
     x = 0
     y = 0
     value = True
@@ -144,7 +142,7 @@ def busca_dados(request, cnpj):
             y = 0
             continue
 
-    #Insert Into Operacoes
+    # Insert Into Operacoes
     for loop in range(200):
         try:
 
@@ -187,7 +185,6 @@ def busca_dados(request, cnpj):
             print(e)
             break
 
-
     try:
         is_ok = Operacoes.objects.filter(cnpj=cnpj)
 
@@ -196,6 +193,7 @@ def busca_dados(request, cnpj):
 
     return HttpResponseRedirect(reverse('polls:informacao', args=[cnpj]))
 
+
 class DetailOperationView(DetailView):
     model = Operacoes
     template_name = 'polls/details.html'
@@ -203,8 +201,8 @@ class DetailOperationView(DetailView):
     pk_url_kwarg = 'pk'
     query_pk_and_slug = True
 
-
     def get(self, request, *args, **kwargs):
-        response = serializers.serialize("json",  Operacoes.objects.filter(pk=self.kwargs['pk']))
+        response = serializers.serialize(
+            "json",  Operacoes.objects.filter(pk=self.kwargs['pk']))
         dict = json.loads(response)
         return JsonResponse(dict, safe=False)
