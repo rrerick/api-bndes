@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+
+    db:
+        image: kartoza/postgis:14-3.2
+        environment:
+            - POSTGRES_DB=atlante
+            - POSTGRES_USER=admin
+            - POSTGRES_PASS=admin
+        restart: on-failure
+        healthcheck:
+            test: "pg_isready -U admin -d postgres -h localhost"
+
+    dev:
+        build:
+            context: .
+            dockerfile: ./Dockerfile
+        command: >
+            bash -c "export
+            && python manage.py makemigrations --no-input
+            && python manage.py migrate --no-input
+            && python manage.py runserver 0.0.0.0:8000"
+        ports:
+            - "8000:8000"
+        volumes:
+            - .:/app/
+        environment:
+            SECRET_KEY: django-insecure-i6*xlk8y4!2ii@mshij!3c6+c&m+s73*j=*si=$$@p!n=371_@3
+            DB_USER: admin
+            DB_NAME: atlante
+            DB_PASS: admin
+            DB_HOST: db
+            PORT: 8000
+        links:
+            - db
+        depends_on:
+            - db
+        restart: on-failure
+
