@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import Operacoes, Empresa, BNDESOperacoes, ArchiveBNDESOperacoes
+from .models import Transaction, Company, BNDESTransaction, ArchiveBNDESTransaction
 
 # Register your models here.
 admin.site.register(
-    [Operacoes, Empresa, BNDESOperacoes, ArchiveBNDESOperacoes])
+    [Transaction, Company, BNDESTransaction, ArchiveBNDESTransaction])

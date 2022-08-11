@@ -1,13 +1,13 @@
 from django import forms
-from .models import Empresa
+from .models import Company
 
 
 class CnpjForm(forms.Form):
     cnpj = forms.CharField(label='CNPJ', initial='14 digitos')
 
     def save(self, *args):
-        context = Empresa(
-            cnpj_id=int(self.data['cnpj'])
+        context = Company(
+            cnpj=int(self.data['cnpj'])
         )
         context.save()
         return context

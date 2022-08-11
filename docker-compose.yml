@@ -5,7 +5,7 @@ services:
     db:
         image: kartoza/postgis:14-3.2
         environment:
-            - POSTGRES_DB=atlante
+            - POSTGRES_DB=bndes
             - POSTGRES_USER=admin
             - POSTGRES_PASS=admin
         restart: on-failure
@@ -28,7 +28,7 @@ services:
         environment:
             SECRET_KEY: django-insecure-i6*xlk8y4!2ii@mshij!3c6+c&m+s73*j=*si=$$@p!n=371_@3
             DB_USER: admin
-            DB_NAME: atlante
+            DB_NAME: bndes
             DB_PASS: admin
             DB_HOST: db
             PORT: 8000

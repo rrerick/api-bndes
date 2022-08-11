@@ -1,57 +1,57 @@
 from rest_framework import serializers
-from .models import Operacoes, Empresa, BNDESOperacoes, ArchiveBNDESOperacoes
+from .models import Transaction, Company, BNDESTransaction, ArchiveBNDESTransaction
 
 
-class BNDESOperacoesSerializers(serializers.ModelSerializer):
-    """CLASS to serialize 'serializers.BNDESOperacoes' model data
+class BNDESTransactionSerializers(serializers.ModelSerializer):
+    """CLASS to serialize 'serializers.BNDESTransaction' model data
     """
 
     def create(self, validated_data):
-        """METHOD for saving BNDESOperacoes serialized data on database
+        """METHOD for saving BNDESTransaction serialized data on database
 
         Args:
-            validated_data (dict): BNDESOperacoes serialized data
+            validated_data (dict): BNDESTransaction serialized data
         Returns:
-            dict: BNDESOperacoes serialized data
+            dict: BNDESTransaction serialized data
         """
 
-        response_ope, obj = BNDESOperacoes.objects.filter(
+        response_ope, obj = BNDESTransaction.objects.filter(
             logs=validated_data['logs']
         ).get_or_create(**validated_data)
 
-        if response_ope == False:
+        if obj == False:
             response_ope.save()
 
         return response_ope
 
     class Meta:
-        model = BNDESOperacoes
+        model = BNDESTransaction
         fields = '__all__'
 
 
-class ArchiveBNDESOperacoesSerializers(serializers.Serializer):
-    """METHOD for saving BNDESOperacoes serialized data on database
+class ArchiveBNDESTransactionSerializers(serializers.Serializer):
+    """METHOD for saving BNDESTransaction serialized data on database
     Args:
-        validated_data (dict): BNDESOperacoes serialized data
+        validated_data (dict): BNDESTransaction serialized data
     Returns:
-        dict: BNDESOperacoes serialized data
+        dict: BNDESTransaction serialized data
     """
 
     def create(self, validated_data):
-        """METHOD for saving ArchiveBNDESOperacoes serialized data on database
+        """METHOD for saving ArchiveBNDESTransaction serialized data on database
 
         Args:
-            validated_data (dict): BNDESOperacoes serialized data
+            validated_data (dict): BNDESTransaction serialized data
         Returns:
-            dict: BNDESOperacoes serialized data
+            dict: BNDESTransaction serialized data
         """
-        response_ope = ArchiveBNDESOperacoes.objects.create(**validated_data)
+        response_ope = ArchiveBNDESTransaction.objects.create(**validated_data)
         response_ope.save()
 
         return response_ope
 
     class Meta:
-        model = ArchiveBNDESOperacoes
+        model = ArchiveBNDESTransaction
         fields = (
             'client',
             'logs',

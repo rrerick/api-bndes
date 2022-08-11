@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'connect_api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'atlante'),
+        'NAME': os.environ.get('DB_NAME', 'bndes'),
         'USER': os.environ.get('DB_USER', 'admin'),
         'PASSWORD': os.environ.get('DB_PASS', 'admin'),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
@@ -123,9 +123,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
+#STATICFILES_DIRS = (
+#    os.path.join(BASE_DIR, 'static'),
+#)
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 

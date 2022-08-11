@@ -2,17 +2,17 @@ import pytz
 from rest_framework import (generics, permissions, response, status)
 from django.utils.timezone import localtime
 from BNDESIntegration import serializers
-from .models import BNDESOperacoes, Empresa,  ArchiveBNDESOperacoes
+from .models import BNDESTransaction, Company,  ArchiveBNDESTransaction
 import requests
 from datetime import datetime
 from connect_api import settings
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class BNDES:
 
     response = None
     url = settings.BNDES_URL
-
 
     @staticmethod
     def get_bndes_data(request, specific_param):
@@ -31,14 +31,17 @@ class BNDES:
         params = specific_param
         print(params)
         client_id = BNDES.post_client_identifiers(params)
-        url = BNDES.url + '/%s' % (client_id.cnpj_id)
+        url = BNDES.url + '/%s' % (client_id.cnpj)
+
         verified_url = BNDES.validate_expiration_date(url, params)
         if not verified_url:
             client_id = BNDES.post_client_identifiers(params)
             verified_url = url
 
-        # hora de requisitar ao BNDES
-        if verified_url:
+        # If exists on database, get from there! If not request
+        transaction_exxists = BNDES.get_database_info(client_id)
+
+        if transaction_exxists == None:
             BNDES.get_request(verified_url)
             if BNDES.response:
                 BNDES.store_bndes_response(BNDES.response, client_id)
@@ -47,6 +50,8 @@ class BNDES:
         if BNDES.response:
             response = BNDES.response
             BNDES.response = None
+        elif transaction_exxists:
+            response = transaction_exxists.logs
 
         return response
 
@@ -59,13 +64,13 @@ class BNDES:
         Args:
             url (string): url to request data
         """
-        client_verify = Empresa.objects.get(
-            cnpj_id=params,
+        client_verify = Company.objects.get(
+            cnpj=params,
         )
         expiration_date = localtime(client_verify.validity_day)
 
         today = datetime.now(pytz.timezone('America/Sao_Paulo'))
-        print("On validity: ", expiration_date < today)
+        print("out of expiry date: ", expiration_date < today)
         if expiration_date < today:
             BNDES.store_bndes_archive_data(params, client_verify)
         else:
@@ -79,14 +84,13 @@ class BNDES:
         Args:
             params (string): CPF or CNPJ
         """
-
-        client, obj = Empresa.objects.filter(cnpj_id=params).get_or_create(
-            cnpj_id=params
+        client, obj = Company.objects.filter(cnpj=params).get_or_create(
+            cnpj=params
         )
-
-        if obj == False:
+        print('Who: ', client)
+        print('Needs Create: ', obj)
+        if obj:
             client.save()
-
         return client
 
     @classmethod
@@ -98,16 +102,14 @@ class BNDES:
             url (str) : BNDES endpoint url.
         """
 
-        response = requests.get(url).json()
-        obje = response['operacoes'][0].keys()
-        print(list(obje))
+        response_get = requests.get(url).json()
 
         if (
-            len(response.get("operacoes")) != 0 or
-            len(response.get("desembolsos")) != 0 or
-            len(response.get("carteira")) != 0
+            len(response_get.get("operacoes")) != 0 or
+            len(response_get.get("desembolsos")) != 0 or
+            len(response_get.get("carteira")) != 0
         ):
-            BNDES.response = response
+            BNDES.response = response_get
 
     @classmethod
     def store_bndes_response(cls, response, client):
@@ -118,10 +120,10 @@ class BNDES:
         """
 
         serializer_data = {}
-        serializer_data["client"] = client.cnpj_id
+        serializer_data["client"] = client.id
         serializer_data["logs"] = response
 
-        serializer = serializers.BNDESOperacoesSerializers(
+        serializer = serializers.BNDESTransactionSerializers(
             data=serializer_data
         )
 
@@ -135,21 +137,34 @@ class BNDES:
         Args:
             response(dict) : BNDES response, 
         """
-        old_data = BNDESOperacoes.objects.get(client=client)
+        old_data = BNDESTransaction.objects.get(client=client)
 
         serializer_data = {}
         serializer_data["client"] = client
         serializer_data["logs"] = old_data.logs
 
-        serializer = serializers.ArchiveBNDESOperacoesSerializers(
+        serializer = serializers.ArchiveBNDESTransactionSerializers(
             data=serializer_data
         )
         print("objeto do lixo criado")
         serializer.is_valid()
         serializer.save()
         params.delete()
-        return None
+        return False
 
     @classmethod
     def store_bndes_response_oper(cls,):
         pass
+
+    @classmethod
+    def get_database_info(cls, client):
+        """ METHOD to get database info, before request on webpage
+        ARGS:
+            client (query): query from tb_company
+        """
+        try:
+            query_transactions = BNDESTransaction.objects.get(client=client)
+            return query_transactions
+
+        except ObjectDoesNotExist:
+            return None

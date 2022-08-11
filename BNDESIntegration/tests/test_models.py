@@ -6,7 +6,7 @@ import requests
 import pytz
 from django.utils import timezone
 import django.core.exceptions as expt
-from BNDESIntegration.models import Operacoes, Empresa
+from BNDESIntegration.models import Transaction, Company
 
 
 class TestModel(TestCase):

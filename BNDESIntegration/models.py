@@ -7,10 +7,10 @@ import pytz
 
 # Create your models here.
 
-class Empresa(models.Model):
+class Company(models.Model):
     """MODEL to store all requisited client doc
     """
-    cnpj_id = models.BigIntegerField(primary_key=True)
+    cnpj = models.CharField(max_length=15)
     data_search = models.DateTimeField(
         default=datetime.now(pytz.timezone('America/Sao_Paulo')))
     validity_day = models.DateTimeField(
@@ -18,20 +18,20 @@ class Empresa(models.Model):
             datetime.now(pytz.timezone('America/Sao_Paulo')) + timedelta(days=30)))
 
     def __str__(self):
-        return str(self.cnpj_id)
+        return str(self.cnpj)
 
     def format_value(self):
-        cnpj = str(self.cnpj_id)
+        cnpj = str(self.cnpj)
         return '{}.{}.{}/{}-{}'.format(cnpj[:2], cnpj[2:5], cnpj[5:8], cnpj[8:12], cnpj[12:])
 
     class Meta:
-        db_table = 'tb_empresa_cnpj'
-        verbose_name = 'BNDES.Empresa'
+        db_table = 'tb_company'
+        verbose_name = 'BNDES.Company'
 
 
-class Operacoes(models.Model):
+class Transaction(models.Model):
 
-    cnpj = models.ForeignKey(Empresa, on_delete=models.CASCADE)
+    cnpj = models.ForeignKey(Company, on_delete=models.CASCADE)
     agente_financeiro = models.CharField(max_length=100, default='null')
     operacaoDireta = models.CharField(default='null', max_length=10)
     inovacao = models.CharField(default='null', max_length=10)
@@ -74,14 +74,14 @@ class Operacoes(models.Model):
         return 'cliente:' + self.cliente
 
     class Meta:
-        verbose_name = 'operacoe'
-        db_table = 'tb_bndes_operacao'
+        verbose_name = 'transaction'
+        db_table = 'tb_bndes_transaction'
 
 
-class BNDESOperacoes(models.Model):
+class BNDESTransaction(models.Model):
     """MODEL to store BNDES operation requisited
     """
-    client = models.ForeignKey(Empresa, on_delete=models.CASCADE)
+    client = models.ForeignKey(Company, on_delete=models.CASCADE)
     logs = models.JSONField()
     data_created = models.DateTimeField(auto_now_add=True)
 
@@ -94,12 +94,12 @@ class BNDESOperacoes(models.Model):
         return f'{self.client}'
 
     class Meta:
-        db_table = 'tb_bndes_operacao_json'
-        verbose_name = "BNDES.json.operacoe"
+        db_table = 'tb_bndes_transaction_json'
+        verbose_name = "BNDES.json.transaction"
         ordering = ('data_created',)
 
 
-class ArchiveBNDESOperacoes(models.Model):
+class ArchiveBNDESTransaction(models.Model):
 
     client = models.IntegerField()
     logs = models.JSONField()
@@ -109,6 +109,6 @@ class ArchiveBNDESOperacoes(models.Model):
         return f'{self.delete_data}'
 
     class Meta:
-        db_table = 'tb_archive_bndes_operacao'
+        db_table = 'tb_archive_bndes_transaction'
         verbose_name = 'BNDES.Archive'
         ordering = ('delete_data',)
