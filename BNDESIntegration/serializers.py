@@ -15,8 +15,8 @@ class BNDESOperacoesSerializers(serializers.ModelSerializer):
             dict: BNDESOperacoes serialized data
         """
 
-        response_ope,obj = BNDESOperacoes.objects.filter(
-            logs = validated_data['logs']
+        response_ope, obj = BNDESOperacoes.objects.filter(
+            logs=validated_data['logs']
         ).get_or_create(**validated_data)
 
         if response_ope == False:
@@ -28,6 +28,7 @@ class BNDESOperacoesSerializers(serializers.ModelSerializer):
         model = BNDESOperacoes
         fields = '__all__'
 
+
 class ArchiveBNDESOperacoesSerializers(serializers.Serializer):
     """METHOD for saving BNDESOperacoes serialized data on database
     Args:
@@ -35,6 +36,7 @@ class ArchiveBNDESOperacoesSerializers(serializers.Serializer):
     Returns:
         dict: BNDESOperacoes serialized data
     """
+
     def create(self, validated_data):
         """METHOD for saving ArchiveBNDESOperacoes serialized data on database
 

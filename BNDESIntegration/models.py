@@ -11,19 +11,23 @@ class Empresa(models.Model):
     """MODEL to store all requisited client doc
     """
     cnpj_id = models.BigIntegerField(primary_key=True)
-    data_search = models.DateTimeField(default=datetime.now(pytz.timezone('America/Sao_Paulo')))
+    data_search = models.DateTimeField(
+        default=datetime.now(pytz.timezone('America/Sao_Paulo')))
     validity_day = models.DateTimeField(
         default=(
             datetime.now(pytz.timezone('America/Sao_Paulo')) + timedelta(days=30)))
+
     def __str__(self):
         return str(self.cnpj_id)
 
     def format_value(self):
         cnpj = str(self.cnpj_id)
         return '{}.{}.{}/{}-{}'.format(cnpj[:2], cnpj[2:5], cnpj[5:8], cnpj[8:12], cnpj[12:])
+
     class Meta:
         db_table = 'tb_empresa_cnpj'
         verbose_name = 'BNDES.Empresa'
+
 
 class Operacoes(models.Model):
 
@@ -66,7 +70,6 @@ class Operacoes(models.Model):
     ramoAtividade = models.CharField(
         max_length=200, null=True, blank=True, default='null')
 
-
     def __str__(self):
         return 'cliente:' + self.cliente
 
@@ -95,6 +98,7 @@ class BNDESOperacoes(models.Model):
         verbose_name = "BNDES.json.operacoe"
         ordering = ('data_created',)
 
+
 class ArchiveBNDESOperacoes(models.Model):
 
     client = models.IntegerField()
@@ -103,6 +107,7 @@ class ArchiveBNDESOperacoes(models.Model):
 
     def __str__(self):
         return f'{self.delete_data}'
+
     class Meta:
         db_table = 'tb_archive_bndes_operacao'
         verbose_name = 'BNDES.Archive'

@@ -77,13 +77,13 @@ WSGI_APPLICATION = 'connect_api.wsgi.application'
 
 DATABASES = {
     'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME':os.environ.get('DB_NAME', 'atlante'),
-                'USER': os.environ.get('DB_USER', 'admin'),
-                'PASSWORD': os.environ.get('DB_PASS', 'admin'),
-                'HOST': os.environ.get('DB_HOST', 'localhost'),
-                'PORT': '5432',
-            }
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME', 'atlante'),
+        'USER': os.environ.get('DB_USER', 'admin'),
+        'PASSWORD': os.environ.get('DB_PASS', 'admin'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': '5432',
+    }
 }
 
 
@@ -133,3 +133,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+BNDES_URL = os.getenv(
+    'BNDES_URL', "https://apis-gateway.bndes.gov.br/transparencia/v2/cliente/")

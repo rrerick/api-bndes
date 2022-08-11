@@ -7,7 +7,8 @@ from . import views
 app_name = 'BNDESIntegration'
 urlpatterns = [
 
-        re_path(r"^(?P<nome>operacoes|desembolsos|all)/(?P<cnpj>\d{11,14})/$", views.BNDESDatasetGetView.as_view(), name='search'),
+    re_path(r"^(?P<nome>operacoes|desembolsos|all)/(?P<cnpj>\d{11,14})/$",
+            views.BNDESDatasetGetView.as_view(), name='search'),
 
 
 ]

@@ -5,12 +5,14 @@ from BNDESIntegration import serializers
 from .models import BNDESOperacoes, Empresa,  ArchiveBNDESOperacoes
 import requests
 from datetime import datetime
+from connect_api import settings
 
 
 class BNDES:
 
     response = None
-    url = "https://apis-gateway.bndes.gov.br/transparencia/v2/cliente/"
+    url = settings.BNDES_URL
+
 
     @staticmethod
     def get_bndes_data(request, specific_param):
@@ -25,11 +27,10 @@ class BNDES:
             response (dict) : BNDES requested response
 
         """
-        
+
         params = specific_param
         print(params)
         client_id = BNDES.post_client_identifiers(params)
-
         url = BNDES.url + '/%s' % (client_id.cnpj_id)
         verified_url = BNDES.validate_expiration_date(url, params)
         if not verified_url:
@@ -66,7 +67,7 @@ class BNDES:
         today = datetime.now(pytz.timezone('America/Sao_Paulo'))
         print("On validity: ", expiration_date < today)
         if expiration_date < today:
-            BNDES.store_bndes_archive_data(params,client_verify)
+            BNDES.store_bndes_archive_data(params, client_verify)
         else:
             return url
 
@@ -135,7 +136,6 @@ class BNDES:
             response(dict) : BNDES response, 
         """
         old_data = BNDESOperacoes.objects.get(client=client)
-        
 
         serializer_data = {}
         serializer_data["client"] = client
