@@ -15,12 +15,36 @@ services:
     dev:
         build:
             context: .
-            dockerfile: ./Dockerfile
+            dockerfile: ./Dockerfile-dev
         command: >
             bash -c "export
             && python manage.py makemigrations --no-input
             && python manage.py migrate --no-input
-            && python manage.py runserver 0.0.0.0:8000"
+            && python manage.py runserver 0.0.0.0:8080"
+        ports:
+            - "8080:8080"
+        volumes:
+            - .:/app/
+        env_file:
+            - ./.env
+        environment:
+            DB_USER: admin
+            DB_NAME: bndes
+            DB_PASS: admin
+            DB_HOST: db
+            PORT: 8001
+            DEBUG_TKT: True
+        depends_on:
+            - db
+        restart: on-failure
+
+    web:
+        build:
+            context: .
+            dockerfile: ./Dockerfile
+        command: >
+            bash -c "export
+            && exec gunicorn --config gunicorn.conf.py connect_api.wsgi"
         ports:
             - "8000:8000"
         volumes:
@@ -33,9 +57,7 @@ services:
             DB_PASS: admin
             DB_HOST: db
             PORT: 8000
-        links:
-            - db
-        depends_on:
-            - db
+            DEBUG_TKT: False
         restart: on-failure
+
 

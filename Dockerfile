@@ -19,11 +19,7 @@ RUN pip install -U pip setuptools==58.0
 COPY requirements*.txt ./
 RUN pip install -r requirements.txt
 
-#copy local code to the container image
-COPY . ./
 
 # Run the web service on container startup.
 # Here we use the python manage.py webserver,
-CMD python manage.py makemigrations --no-input && python manage.py migrate && python manage.py runserver 0.0.0.0:$PORT
-
-
+CMD gunicorn --config gunicorn.conf.py connect_api.wsgi
