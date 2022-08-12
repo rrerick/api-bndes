@@ -42,6 +42,7 @@ class BNDES:
         transaction_exxists = BNDES.get_database_info(client_id)
 
         if transaction_exxists == None:
+            print('on database: False')
             BNDES.get_request(verified_url)
             if BNDES.response:
                 BNDES.store_bndes_response(BNDES.response, client_id)
@@ -51,6 +52,7 @@ class BNDES:
             response = BNDES.response
             BNDES.response = None
         elif transaction_exxists:
+            print('on database: True')
             response = transaction_exxists.logs
 
         return response

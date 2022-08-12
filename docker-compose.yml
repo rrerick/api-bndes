@@ -25,8 +25,9 @@ services:
             - "8000:8000"
         volumes:
             - .:/app/
+        env_file:
+            - ./.env
         environment:
-            SECRET_KEY: django-insecure-i6*xlk8y4!2ii@mshij!3c6+c&m+s73*j=*si=$$@p!n=371_@3
             DB_USER: admin
             DB_NAME: bndes
             DB_PASS: admin
